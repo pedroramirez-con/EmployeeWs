@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: EmpWS
+server:
+  port: 8080
+  servlet:
+    context-path: /EmpMS
+
