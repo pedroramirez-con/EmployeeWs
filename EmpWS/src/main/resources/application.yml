@@ -39,3 +39,7 @@ spring:
       org.hibernate.SQL: DEBUG # Ver queries
     pattern:
       console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+app:
+  jwt:
+    secret: ${APP_PASS_JWT}
+    expiration-ms: ${APP_EXP_JWT}

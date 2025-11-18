@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -35,7 +36,8 @@ public class EmployeeRequest {
 
   @NotNull(message = ValidEmployeeConstants.DATE_BORN_NOT_NULL)
   @Past(message = ValidEmployeeConstants.DATE_BORN_PAST)
-  @JsonFormat(pattern = ValidEmployeeConstants.DD_MM_YYYY)
+  @Schema(type = "string", format = "date", example = "19-11-2025")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = ValidEmployeeConstants.DD_MM_YYYY)
   private LocalDate birthDate;
 
   @NotBlank(message = ValidEmployeeConstants.NOT_EMPTY_POSITION)
