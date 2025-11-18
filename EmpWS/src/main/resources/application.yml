@@ -1,8 +1,41 @@
+server:
+  port: ${APP_PORT}
+  servlet:
+    context-path: ${APP_CONTEXT}
+
 spring:
   application:
     name: EmpWS
-server:
-  port: 8080
-  servlet:
-    context-path: /EmpMS
 
+  # Configuration of JPA (common)
+  jpa:
+    hibernate:
+      ddl-auto: none # NEVER Use create-drop in prod. Use 'validate' in prod y 'update' in dev/Staging/QA.
+    show-sql: true
+    properties:
+      hibernate.format_sql: true 
+  
+  # Configuration of SpringDoc (Swagger)
+  springdoc:
+    swagger-ui:
+      path: swagger-ui/index.html
+    api-docs:
+      path: /v3/api-docs
+
+  # Configuration of Actuator (Health Check)
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,loggers,metrics
+    endpoint:
+      health:
+        show-details: always
+  #LOG Config
+  logging:
+    level:
+      com.mx.bankx: INFO
+      org.springframework.web: INFO
+      org.hibernate.SQL: DEBUG # Ver queries
+    pattern:
+      console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

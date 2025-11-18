@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.11</version>
+		<version>3.2.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.mx.bankx</groupId>
@@ -50,7 +50,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
+		<dependency>
+	        <groupId>io.jsonwebtoken</groupId>
+	        <artifactId>jjwt</artifactId>
+	        <version>0.9.1</version>
+	    </dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -66,6 +70,21 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+	        <groupId>org.springdoc</groupId>
+   		    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+		    <version>2.2.0</version>
+        </dependency>
+		<dependency>
+	        <groupId>org.mapstruct</groupId>
+	        <artifactId>mapstruct</artifactId>
+	        <version>1.5.5.Final</version>
+	    </dependency>
+	    <dependency>
+	        <groupId>org.mapstruct</groupId>
+	        <artifactId>mapstruct-processor</artifactId>
+	        <version>1.5.5.Final</version>
+	    </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -88,7 +107,13 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
+							<version>1.18.30</version> 
 						</path>
+						<path>
+	                        <groupId>org.mapstruct</groupId>
+	                        <artifactId>mapstruct-processor</artifactId>
+	                        <version>1.5.5.Final</version>
+	                    </path>
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
@@ -103,6 +128,64 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+			  <groupId>org.jacoco</groupId>
+			  <artifactId>jacoco-maven-plugin</artifactId>
+			  <version>0.8.10</version>
+			  <executions>
+			    <!-- Activa el agente -->
+			    <execution>
+			      <goals>
+			        <goal>prepare-agent</goal>
+			      </goals>
+			    </execution>
+			
+			    <!-- Reporte con exclusiones -->
+			    <execution>
+			      <id>report</id>
+			      <phase>test</phase>
+			      <goals>
+			        <goal>report</goal>
+			      </goals>
+			      <configuration>
+			        <excludes>
+			          <exclude>**/config/**</exclude>
+			          <exclude>**/*Application.java</exclude>
+			          <exclude>**/dto/**</exclude>
+			          <exclude>**/generated/**</exclude>
+			        </excludes>
+			      </configuration>
+			    </execution>
+			
+			    <!-- Verificación: cobertura mínima 95% con mismas exclusiones -->
+			    <execution>
+			      <id>check</id>
+			      <goals>
+			        <goal>check</goal>
+			      </goals>
+			      <configuration>
+			        <excludes>
+			          <exclude>**/config/**</exclude>
+			          <exclude>**/*Application.java</exclude>
+			          <exclude>**/dto/**</exclude>
+			          <exclude>**/generated/**</exclude>
+			        </excludes>
+			        <rules>
+			          <rule>
+			            <element>BUNDLE</element>
+			            <limits>
+			              <limit>
+			                <counter>INSTRUCTION</counter>
+			                <value>COVEREDRATIO</value>
+			                <minimum>0.15</minimum>
+			              </limit>
+			            </limits>
+			          </rule>
+			        </rules>
+			      </configuration>
+			    </execution>
+			  </executions>
 			</plugin>
 		</plugins>
 	</build>

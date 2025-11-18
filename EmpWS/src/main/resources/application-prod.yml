@@ -1,0 +1,15 @@
+# Perfil PROD (Oracle)
+spring:
+  profiles: prod
+  
+  datasource:
+    # Usar variables de entorno (Práctica DevSecOps)
+    url: ${DB_URL} # jdbc:oracle:thin:@your_oracle_host:1521:ORCL
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driverClassName: oracle.jdbc.driver.OracleDriver
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate # Valida que el esquema (SQL) coincida con las entidades
+    database-platform: org.hibernate.dialect.Oracle12cDialect
