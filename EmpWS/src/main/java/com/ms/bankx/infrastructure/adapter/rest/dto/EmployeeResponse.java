@@ -8,12 +8,14 @@ package com.ms.bankx.infrastructure.adapter.rest.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
  * The Object what will be exposed by this app to response
  */
 @Data
+@AllArgsConstructor
 public class EmployeeResponse {
   private Long id;
   private String firstName;

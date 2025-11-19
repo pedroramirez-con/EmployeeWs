@@ -22,26 +22,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtTokenProvider tokenProvider;
+  private final JwtTokenProvider tokenProvider;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .cors(cors -> {}) // habilita CORS con configuración por defecto
-            .csrf(csrf -> csrf.disable()) // deshabilitar CSRF para APIs REST
-            .sessionManagement(session -> 
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) // API sin estado
-            )
-            .authorizeHttpRequests(auth -> auth
-                // Permitir acceso a Swagger y Health Check sin autenticación
-                .requestMatchers("/employees/**", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/health").permitAll()
-                // Proteger todos los demás endpoints
-                //.requestMatchers("/employees/**").authenticated()
-                .anyRequest().authenticated()
-            )
-            // Añadir nuestro filtro JWT antes del filtro de Spring
-            .addFilterBefore(new JwtAuthFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
+  private static final String[] URLS_WITHOUT_TOKEN =
+      {"/auth/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/health"};
 
-        return http.build();
-    }
+  @Bean
+  SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.cors(cors -> {
+    }).csrf(csrf -> csrf.disable())
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth.requestMatchers(URLS_WITHOUT_TOKEN).permitAll()
+            .requestMatchers("/employees/**").authenticated().anyRequest().authenticated())
+        // para que la consola H2 funcione
+        .headers(headers -> headers.frameOptions(frame -> frame.disable())).addFilterBefore(
+            new JwtAuthFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+  }
 }

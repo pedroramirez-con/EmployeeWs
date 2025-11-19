@@ -11,13 +11,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Collections;
+import java.util.Date;
 
 /**
  * 
@@ -25,29 +27,81 @@ import java.util.Collections;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${app.jwt.secret}") // Inyectar desde properties (DevSecOps)
+    @Value("${app.jwt.secret}")
     private String jwtSecret;
 
     @Value("${app.jwt.expiration-ms}")
     private int jwtExpirationMs;
 
-    // Método para validar el token
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Generate a JWT token for a user.
+     *
+     * @param username name of user
+     * @return token JWT signed
+     */
+    public String generateToken(String username) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
+
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    /**
+     * Validate a token JWT.
+     *
+     * @param authToken token to validated.
+     * @return true if valid, false otherwise.
+     */
     public boolean validateToken(String authToken) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+            Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(authToken);
             return true;
-        } catch (SignatureException | MalformedJwtException | ExpiredJwtException | UnsupportedJwtException | IllegalArgumentException ex) {
-            // Loggear el error
+        } catch (JwtException | IllegalArgumentException ex) {
+            // Aquí puedes loggear el error
+            return false;
         }
-        return false;
     }
 
+    /**
+     * It obtains authentication from a JWT token.
+     *
+     * @param token token JWT
+     * @return object Authentication with user and roles
+     */
     public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
         String username = claims.getSubject();
-        return new UsernamePasswordAuthenticationToken(username, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+        // Aquí mapear roles desde claims si se guardan en el token
+        return new UsernamePasswordAuthenticationToken(
+                username,
+                null,
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+        );
     }
 
+    /**
+     * Resolve the JWT token from the Authorization header.
+     *
+     * @param req request HTTP
+     * @return token JWT o null if not exist
+     */
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -56,3 +110,4 @@ public class JwtTokenProvider {
         return null;
     }
 }
+

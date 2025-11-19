@@ -16,25 +16,35 @@ import java.io.IOException;
 
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider tokenProvider;
+  private final JwtTokenProvider tokenProvider;
 
-    public JwtAuthFilter(JwtTokenProvider tokenProvider) {
-        this.tokenProvider = tokenProvider;
+  public JwtAuthFilter(JwtTokenProvider tokenProvider) {
+    this.tokenProvider = tokenProvider;
+  }
+
+  @Override
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+      FilterChain filterChain) throws ServletException, IOException {
+
+    String uri = request.getRequestURI();
+
+    // 👇 Ignorar rutas públicas como H2, Swagger, etc.
+    if (uri.startsWith("/h2-console") || uri.startsWith("/swagger-ui")
+        || uri.startsWith("/v3/api-docs") || uri.startsWith("/auth/token")) {
+      filterChain.doFilter(request, response);
+      return;
     }
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-        try {
-            String jwt = tokenProvider.resolveToken(request);
-            if (jwt != null && tokenProvider.validateToken(jwt)) {
-                Authentication auth = tokenProvider.getAuthentication(jwt);
-                SecurityContextHolder.getContext().setAuthentication(auth);
-            }
-        } catch (Exception ex) {
-            // Loggear error de autenticación
-        }
-
-        filterChain.doFilter(request, response);
+    try {
+      String jwt = tokenProvider.resolveToken(request);
+      if (jwt != null && tokenProvider.validateToken(jwt)) {
+        Authentication auth = tokenProvider.getAuthentication(jwt);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+      }
+    } catch (Exception ex) {
+      // Loggear error de autenticación
     }
+
+    filterChain.doFilter(request, response);
+  }
 }

@@ -6,7 +6,8 @@ server:
 spring:
   application:
     name: EmpWS
-
+  profiles:
+    active: dev
   # Configuration of JPA (common)
   jpa:
     hibernate:
@@ -21,7 +22,6 @@ spring:
       path: swagger-ui/index.html
     api-docs:
       path: /v3/api-docs
-
   # Configuration of Actuator (Health Check)
   management:
     endpoints:

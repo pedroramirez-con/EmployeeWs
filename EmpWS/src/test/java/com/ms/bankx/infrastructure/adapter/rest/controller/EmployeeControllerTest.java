@@ -20,12 +20,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.ms.bankx.application.mapper.EmployeeApiMapper;
+import com.ms.bankx.application.mapper.EmployeeApiMapperImpl;
 import com.ms.bankx.domain.exception.EmployeeNotFoundException;
 import com.ms.bankx.domain.model.Employee;
 import com.ms.bankx.domain.port.api.EmployeeServicePort;
 
 @WebMvcTest(controllers = EmployeeController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@Import({EmployeeApiMapper.class}) 
 class EmployeeControllerTest {
 
     @Autowired
