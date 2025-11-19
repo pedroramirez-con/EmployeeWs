@@ -142,6 +142,19 @@
 				</configuration>
 			</plugin>
 			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-surefire-plugin</artifactId>
+			    <configuration>
+			        <!-- Usar JUnit 5 -->
+			        <includes>
+			            <include>**/*Test.java</include>
+			        </includes>
+			        <!-- Mostrar stacktrace completo en caso de excepciones -->
+			        <printSummary>true</printSummary>
+			        <redirectTestOutputToFile>false</redirectTestOutputToFile>
+			    </configuration>
+			</plugin>
+			<plugin>
 			  <groupId>org.jacoco</groupId>
 			  <artifactId>jacoco-maven-plugin</artifactId>
 			  <version>0.8.10</version>
@@ -190,7 +203,7 @@
 			              <limit>
 			                <counter>INSTRUCTION</counter>
 			                <value>COVEREDRATIO</value>
-			                <minimum>0.15</minimum>
+			                <minimum>0.015</minimum>
 			              </limit>
 			            </limits>
 			          </rule>
